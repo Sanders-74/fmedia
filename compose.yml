@@ -1,0 +1,88 @@
+services:
+
+  wordpress:
+    image: wordpress:latest
+    restart: always
+    hostname: blog
+    domainname: blog.example.com
+    container_name: blog
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wpbuser
+      WORDPRESS_DB_PASSWORD: wpblogdbpassword
+      WORDPRESS_DB_NAME: wpblogdb
+    depends_on: 
+      - db  
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - wordpressblognet  
+
+  db:
+    image: mysql:latest
+    restart: always
+    hostname: db
+    container_name: db
+    environment:
+      MYSQL_DATABASE: wpblogdb
+      MYSQL_USER: wpbuser
+      MYSQL_PASSWORD: wpblogdbpassword
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      - wordpressblognet  
+  
+  prometheus:
+    image: prom/prometheus:latest
+    hostname: prom
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    environment:
+      TZ: "Europe/Moscow"
+    networks:
+      - wordpressblognet  
+    depends_on:
+      - wordpress
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml 
+
+  node-exporter:
+    image: prom/node-exporter
+    ports:
+      - 9100:9100
+
+  grafana:
+    image: grafana/grafana
+    user: root
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    container_name: grafana
+    hostname: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    networks:
+      - wordpressblognet 
+
+volumes:
+  wordpress:
+  db:
+  
+networks:
+  wordpressblognet:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/28
