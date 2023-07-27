@@ -62,7 +62,7 @@ services:
       - 9100:9100
 
   cAdvisor:
-    image: google/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor
     ports:
       - 8080:80
     volumes:
