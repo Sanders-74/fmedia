@@ -64,7 +64,7 @@ services:
   cAdvisor:
     image: gcr.io/cadvisor/cadvisor
     ports:
-      - 8080:80
+      - 8081:80
     volumes:
       - /:/rootfs/:ro
       - /var/run:/var/run:rw
