@@ -12,7 +12,7 @@ useradd -m wpb
 adduser wpb docker
 adduser wpb sudo
 passwd wpb < wpbcreds.txt
-mv /etc/hosts /etc/hosts.bak
+cp /etc/hosts /etc/hosts.bak
 echo "172.28.0.3 blog.example.com" >> /etc/hosts
 su wpb
 cd /home/wpb
