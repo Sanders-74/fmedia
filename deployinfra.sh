@@ -8,14 +8,18 @@ sudo apt install tzdata -y
 #sudo systemctl enable chronyd
 #sudo systemctl status chronyd
 
-sudo useradd -m wpb
+useradd -m wpb
+adduser wpb docker
+adduser wpb sudo
+passwd wpb < wpbcreds.txt
+mv /etc/hosts /etc/hosts.bak
+echo "172.28.0.3 blog.example.com" >> /etc/hosts
 su wpb
 cd /home/wpb
 git clone https://github.com/Sanders-74/fmedia.git ./fmedia 
 cd fmedia
 cat pdata.dat | docker login --username sanders2022 --password-stdin
 
-#docker pull prom/prometheus
 sudo cp ./docker/daemon.json /etc/docker/
 docker-compose up --build -d
 
