@@ -38,7 +38,7 @@ services:
   
   prometheus:
     image: prom/prometheus:latest
-    hostname: prom
+    hostname: prometheus
     container_name: prometheus
     ports:
       - 9090:9090
@@ -59,8 +59,11 @@ services:
   node-exporter:
     image: prom/node-exporter
     ports:
-      - 9100:9100
-    container_name: node-exporter  
+      - 9100
+    container_name: nodeexporter
+    hostname: nodeexporter  
+    depends_on: 
+      - prometheus
     networks:
       - wordpressblognet     
 
@@ -68,7 +71,10 @@ services:
     image: gcr.io/cadvisor/cadvisor
     ports:
       - 8081:80
-    container_name: cadvisor  
+    container_name: cadvisor
+    hostname: cadvisor 
+    depends_on: 
+      - prometheus     
     volumes:
       - /:/rootfs/:ro
       - /var/run:/var/run:rw
